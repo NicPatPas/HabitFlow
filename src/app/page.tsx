@@ -8,6 +8,10 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { ConfettiBurst } from "@/components/animations/confetti-burst";
 import { useReward } from "@/hooks/use-reward";
+import { NextBestActionCard } from "@/components/dashboard/next-best-action-card";
+import { PerfectDayCard } from "@/components/dashboard/perfect-day-card";
+import { getNextBestAction } from "@/lib/next-best-action";
+import { computePerfectDays } from "@/lib/perfect-day";
 import type { HabitFormData } from "@/types";
 import type { Habit, HabitCheckIn } from "@prisma/client";
 import type { StreakResult } from "@/lib/streak";
@@ -349,6 +353,17 @@ export default function DashboardPage() {
     ...(data?.habits.map((h) => h.streak.bestStreak) ?? [0])
   );
 
+  // Next Best Action — only when there are pending habits
+  const nextAction = data && pendingHabits.length > 0
+    ? getNextBestAction(pendingHabits)
+    : null;
+
+  // Perfect Day summary — computed client-side from existing data
+  // (data.habits includes checkIns[] from the dashboard API)
+  const perfectDaySummary = data
+    ? computePerfectDays(data.habits as (typeof data.habits[0] & { checkIns: HabitCheckIn[] })[])
+    : null;
+
   return (
     <div className="space-y-8 pb-8">
       {/* Page-level confetti */}
@@ -473,6 +488,47 @@ export default function DashboardPage() {
               }}
             />
           </div>
+        </div>
+      )}
+
+      {/* ── Next Best Action ─────────────────────────────────────────── */}
+      {loading ? (
+        <Skeleton className="h-36 rounded-2xl" />
+      ) : nextAction ? (
+        <NextBestActionCard
+          action={nextAction}
+          onQuickAction={async (habitId, d) => {
+            await handleCheckIn(habitId, d);
+          }}
+          onOpenModal={() => {
+            const h = data?.habits.find((x) => x.id === nextAction.habit.id);
+            if (h) setCheckInHabit(h);
+          }}
+        />
+      ) : data && pct === 100 && data.habits.length > 0 ? (
+        <div
+          className="rounded-2xl border p-5 flex items-center gap-4"
+          style={{
+            background: "radial-gradient(ellipse at 30% 50%, #4ade8012, transparent 55%), hsl(240 7% 9%)",
+            borderColor: "#4ade8030",
+          }}
+        >
+          <div className="text-3xl">🏆</div>
+          <div>
+            <div className="font-bold text-sm" style={{ color: "#4ade80" }}>
+              Perfect day achieved!
+            </div>
+            <div className="text-xs mt-0.5" style={{ color: "hsl(240 4% 45%)" }}>
+              All {data.habits.length} habits completed — incredible.
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {/* ── Perfect Day ──────────────────────────────────────────────── */}
+      {!loading && perfectDaySummary && data && data.habits.length > 0 && (
+        <div style={{ position: "relative" }}>
+          <PerfectDayCard summary={perfectDaySummary} />
         </div>
       )}
 

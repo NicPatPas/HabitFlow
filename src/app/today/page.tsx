@@ -8,6 +8,8 @@ import { CheckCircle2, Circle, Flame, Zap } from "lucide-react";
 import { SparkBurst } from "@/components/animations/spark-burst";
 import { ConfettiBurst } from "@/components/animations/confetti-burst";
 import { useReward } from "@/hooks/use-reward";
+import { NextBestActionCard } from "@/components/dashboard/next-best-action-card";
+import { getNextBestAction } from "@/lib/next-best-action";
 import type { Habit, HabitCheckIn } from "@prisma/client";
 import type { StreakResult } from "@/lib/streak";
 
@@ -66,6 +68,7 @@ export default function TodayPage() {
   ).length;
   const pct = habits.length > 0 ? Math.round((done / habits.length) * 100) : 0;
   const pending = habits.filter((h) => !h.todayCheckIn);
+  const nextAction = pending.length > 0 ? getNextBestAction(pending) : null;
   const completed = habits.filter(
     (h) => h.todayCheckIn?.status === "DONE" || h.todayCheckIn?.status === "PARTIAL"
   );
@@ -169,6 +172,20 @@ export default function TodayPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── Next Best Action ──────────────────────────────────────────── */}
+      {!loading && nextAction && (
+        <NextBestActionCard
+          action={nextAction}
+          onQuickAction={async (habitId, d) => {
+            await handleCheckIn(habitId, d);
+          }}
+          onOpenModal={() => {
+            const h = habits.find((x) => x.id === nextAction.habit.id);
+            if (h) setActiveHabit(h);
+          }}
+        />
       )}
 
       {/* Habits list */}
