@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String   @default("Demo User")
+  email     String   @unique @default("demo@habits.app")
+  createdAt DateTime @default(now())
+  habits    Habit[]
+}
+
+// frequencyType: "DAILY" | "WEEKLY" | "CUSTOM"
+// difficulty: "EASY" | "MEDIUM" | "HARD"
+model Habit {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  emoji         String   @default("✅")
+  color         String   @default("#6366f1")
+  frequencyType String   @default("DAILY")
+  frequencyDays Int      @default(7)
+  targetValue   Float?
+  targetUnit    String?
+  reminderTime  String?
+  difficulty    String   @default("MEDIUM")
+  streakFreeze  Boolean  @default(false)
+  archivedAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  checkIns      HabitCheckIn[]
+}
+
+// status: "DONE" | "PARTIAL" | "SKIPPED" | "FAILED"
+model HabitCheckIn {
+  id                  String   @id @default(cuid())
+  habitId             String
+  habit               Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  date                String
+  status              String
+  valueCompleted      Float?
+  targetValueSnapshot Float?
+  notes               String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([habitId, date])
+}

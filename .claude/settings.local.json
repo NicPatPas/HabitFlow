@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git)",
+      "Read(//c/Users/Nico/Desktop/ClaudeProjects/**)",
+      "Bash(npx create-next-app@16.2.3 habit-app --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx ts-node:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(python3 -c ':*)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}
