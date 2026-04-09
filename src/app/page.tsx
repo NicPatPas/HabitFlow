@@ -505,32 +505,7 @@ export default function DashboardPage() {
             if (h) setCheckInHabit(h);
           }}
         />
-      ) : data && pct === 100 && data.habits.length > 0 ? (
-        <div
-          className="rounded-2xl border p-5 flex items-center gap-4"
-          style={{
-            background: "radial-gradient(ellipse at 30% 50%, #4ade8012, transparent 55%), hsl(240 7% 9%)",
-            borderColor: "#4ade8030",
-          }}
-        >
-          <div className="text-3xl">🏆</div>
-          <div>
-            <div className="font-bold text-sm" style={{ color: "#4ade80" }}>
-              Perfect day achieved!
-            </div>
-            <div className="text-xs mt-0.5" style={{ color: "hsl(240 4% 45%)" }}>
-              All {data.habits.length} habits completed — incredible.
-            </div>
-          </div>
-        </div>
       ) : null}
-
-      {/* ── Perfect Day ──────────────────────────────────────────────── */}
-      {!loading && perfectDaySummary && data && data.habits.length > 0 && (
-        <div style={{ position: "relative" }}>
-          <PerfectDayCard summary={perfectDaySummary} />
-        </div>
-      )}
 
       {/* Stats grid */}
       {loading ? (
@@ -639,6 +614,34 @@ export default function DashboardPage() {
                 }
               />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Perfect Day ──────────────────────────────────────── */}
+      {!loading && perfectDaySummary && data && data.habits.length > 0 && (
+        <div style={{ marginTop: "3rem" }}>
+          <PerfectDayCard summary={perfectDaySummary} />
+        </div>
+      )}
+
+      {/* Perfect day achieved banner */}
+      {!loading && data && pct === 100 && data.habits.length > 0 && (
+        <div
+          className="rounded-2xl border p-4 flex items-center gap-3"
+          style={{
+            background: "radial-gradient(ellipse at 20% 50%, #4ade8010, transparent 55%), hsl(240 7% 9%)",
+            borderColor: "#4ade8025",
+          }}
+        >
+          <div className="text-2xl">🏆</div>
+          <div>
+            <div className="font-bold text-sm" style={{ color: "#4ade80" }}>
+              Perfect day achieved!
+            </div>
+            <div className="text-xs mt-0.5" style={{ color: "hsl(240 4% 45%)" }}>
+              All {data.habits.length} habits completed — incredible.
+            </div>
           </div>
         </div>
       )}
