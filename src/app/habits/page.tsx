@@ -54,7 +54,7 @@ export default function HabitsPage() {
   const onStreak = habits.filter((h) => h.streak.currentStreak > 0).length;
 
   return (
-    <div className="space-y-8 pb-8">
+    <div className="space-y-8 pb-12">
       {/* Header */}
       <div className="flex items-start justify-between pt-1">
         <div>

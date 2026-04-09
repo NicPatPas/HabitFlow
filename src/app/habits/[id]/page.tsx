@@ -87,7 +87,7 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
   ];
 
   return (
-    <div className="space-y-8 pb-8">
+    <div className="space-y-8 pb-12">
       {/* Header */}
       <div className="flex items-start gap-3 pt-1">
         <button

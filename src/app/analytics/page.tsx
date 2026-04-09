@@ -45,7 +45,7 @@ const TABS = ["weekly", "daily", "dow", "heatmap"] as const;
 type Tab = typeof TABS[number];
 const TAB_LABELS: Record<Tab, string> = { weekly: "Weekly", daily: "30 Days", dow: "By Day", heatmap: "Heatmap" };
 
-function StatCard({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: string; accent: string }) {
+function StatCard({ icon, label, value, accent, sub }: { icon: React.ReactNode; label: string; value: string; accent: string; sub?: string }) {
   return (
     <div className="rounded-2xl border p-5"
       style={{
@@ -54,17 +54,18 @@ function StatCard({ icon, label, value, accent }: { icon: React.ReactNode; label
         boxShadow: "0 2px 16px hsl(240 10% 3% / 0.5)",
       }}>
       <div className="flex items-center gap-2 mb-3">
-        <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${accent}15` }}>
+        <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${accent}15` }}>
           {icon}
         </div>
-        <span className="text-xs font-medium" style={{ color: "hsl(240 4% 45%)" }}>{label}</span>
+        <span className="text-xs font-medium" style={{ color: "hsl(240 4% 36%)" }}>{label}</span>
       </div>
-      <div className="text-3xl font-bold tabular-nums" style={{ color: "hsl(0 0% 97%)" }}>{value}</div>
+      <div className="text-3xl font-bold tabular-nums" style={{ color: "hsl(0 0% 99%)" }}>{value}</div>
+      {sub && <p className="text-xs mt-1" style={{ color: "hsl(240 4% 30%)" }}>{sub}</p>}
     </div>
   );
 }
 
-function ChartCard({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
+function ChartCard({ title, icon, subtitle, children }: { title: string; icon: React.ReactNode; subtitle?: string; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl border overflow-hidden"
       style={{
@@ -72,9 +73,12 @@ function ChartCard({ title, icon, children }: { title: string; icon: React.React
         borderColor: "hsl(240 4% 16%)",
         boxShadow: "0 2px 16px hsl(240 10% 3% / 0.4)",
       }}>
-      <div className="px-6 pt-5 pb-4 flex items-center gap-2 border-b" style={{ borderColor: "hsl(240 4% 13%)" }}>
-        <span style={{ color: "hsl(240 4% 45%)" }}>{icon}</span>
-        <h2 className="text-sm font-semibold" style={{ color: "hsl(0 0% 92%)" }}>{title}</h2>
+      <div className="px-6 pt-5 pb-4 flex items-center gap-2.5 border-b" style={{ borderColor: "hsl(240 4% 13%)" }}>
+        <span style={{ color: "hsl(240 4% 40%)" }}>{icon}</span>
+        <div>
+          <h2 className="text-sm font-semibold" style={{ color: "hsl(0 0% 92%)" }}>{title}</h2>
+          {subtitle && <p className="text-xs mt-0.5" style={{ color: "hsl(240 4% 34%)" }}>{subtitle}</p>}
+        </div>
       </div>
       <div className="p-6">{children}</div>
     </div>
@@ -93,7 +97,7 @@ export default function AnalyticsPage() {
   }, []);
 
   return (
-    <div className="space-y-8 pb-8">
+    <div className="space-y-8 pb-12">
       {/* Header */}
       <div className="pt-1">
         <h1 className="text-xl font-bold tracking-tight" style={{ color: "hsl(0 0% 95%)" }}>Analytics</h1>
@@ -109,10 +113,10 @@ export default function AnalyticsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard icon={<TrendingUp className="h-4 w-4" style={{ color: "#22c55e" }} />} label="Completion Rate" value={`${data?.overallCompletionRate ?? 0}%`} accent="#22c55e" />
-          <StatCard icon={<Flame className="h-4 w-4" style={{ color: "#f97316" }} />} label="Longest Streak" value={`${data?.globalStreak.longestEverStreak ?? 0}d`} accent="#f97316" />
-          <StatCard icon={<Target className="h-4 w-4" style={{ color: "#3b82f6" }} />} label="Avg / Day" value={String(data?.avgPerDay ?? 0)} accent="#3b82f6" />
-          <StatCard icon={<Activity className="h-4 w-4" style={{ color: "#a855f7" }} />} label="Best Day" value={data?.bestDay ?? "—"} accent="#a855f7" />
+          <StatCard icon={<TrendingUp className="h-4 w-4" style={{ color: "#22c55e" }} />} label="Completion Rate" value={`${data?.overallCompletionRate ?? 0}%`} accent="#22c55e" sub="all time" />
+          <StatCard icon={<Flame className="h-4 w-4" style={{ color: "#f97316" }} />} label="Longest Streak" value={`${data?.globalStreak.longestEverStreak ?? 0}d`} accent="#f97316" sub="personal best" />
+          <StatCard icon={<Target className="h-4 w-4" style={{ color: "#3b82f6" }} />} label="Avg / Day" value={String(data?.avgPerDay ?? 0)} accent="#3b82f6" sub="habits completed" />
+          <StatCard icon={<Activity className="h-4 w-4" style={{ color: "#a855f7" }} />} label="Best Day" value={data?.bestDay ?? "—"} accent="#a855f7" sub="most productive" />
         </div>
       )}
 
@@ -137,7 +141,7 @@ export default function AnalyticsPage() {
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="text-3xl font-bold tabular-nums" style={{ color: "#f97316" }}>{value}</div>
-                <div className="text-xs mt-0.5" style={{ color: "hsl(25 20% 45%)" }}>{label}</div>
+                <div className="text-xs mt-1" style={{ color: "hsl(25 15% 38%)" }}>{label}</div>
               </div>
             ))}
           </div>
@@ -164,7 +168,7 @@ export default function AnalyticsPage() {
 
       {/* Chart panels */}
       {tab === "weekly" && (
-        <ChartCard title="Weekly Completion Rate" icon={<BarChart3 className="h-4 w-4" />}>
+        <ChartCard title="Weekly Completion Rate" subtitle="Completion % over time" icon={<BarChart3 className="h-4 w-4" />}>
           {loading ? <Skeleton className="h-64" /> : (
             <ResponsiveContainer width="100%" height={260}>
               <LineChart data={data?.weeklyChart} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
@@ -182,7 +186,7 @@ export default function AnalyticsPage() {
       )}
 
       {tab === "daily" && (
-        <ChartCard title="Daily Completions (Last 30 Days)" icon={<BarChart3 className="h-4 w-4" />}>
+        <ChartCard title="Daily Completions" subtitle="Last 30 days" icon={<BarChart3 className="h-4 w-4" />}>
           {loading ? <Skeleton className="h-64" /> : (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={data?.dailyChart.slice(-30)} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
@@ -199,7 +203,7 @@ export default function AnalyticsPage() {
       )}
 
       {tab === "dow" && (
-        <ChartCard title="Completion by Day of Week" icon={<Activity className="h-4 w-4" />}>
+        <ChartCard title="By Day of Week" subtitle="Which days you perform best" icon={<Activity className="h-4 w-4" />}>
           {loading ? <Skeleton className="h-64" /> : (
             <>
               <ResponsiveContainer width="100%" height={260}>
@@ -227,7 +231,7 @@ export default function AnalyticsPage() {
       )}
 
       {tab === "heatmap" && (
-        <ChartCard title="Activity Heatmap (Last 365 Days)" icon={<Calendar className="h-4 w-4" />}>
+        <ChartCard title="Activity Heatmap" subtitle="Past 365 days" icon={<Calendar className="h-4 w-4" />}>
           {loading ? <Skeleton className="h-32" /> : (
             <>
               <div className="flex flex-wrap gap-1">

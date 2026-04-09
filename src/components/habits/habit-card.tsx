@@ -41,11 +41,15 @@ export function HabitCard({ habit, streak, todayCheckIn, onDelete, onUpdate, onC
       <div
         className={cn("relative rounded-2xl border transition-all duration-200 overflow-hidden group", isDone && "opacity-60")}
         style={{
-          backgroundColor: hovered ? "hsl(240 7% 11%)" : "hsl(240 7% 9%)",
+          background: isDone && !hovered
+            ? `linear-gradient(90deg, ${habit.color}07 0%, hsl(240 7% 9%) 45%)`
+            : hovered ? "hsl(240 7% 11%)" : "hsl(240 7% 9%)",
           borderColor: hovered
             ? `${habit.color}45`
             : justCompleted
             ? `${habit.color}50`
+            : isDone
+            ? `${habit.color}22`
             : "hsl(240 4% 16%)",
           boxShadow: justCompleted
             ? `0 0 0 1px ${habit.color}20, 0 4px 24px ${habit.color}18`

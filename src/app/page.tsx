@@ -45,15 +45,15 @@ function StatCard({
         >
           {icon}
         </div>
-        <span className="text-xs font-medium" style={{ color: "hsl(var(--muted-foreground))" }}>
+        <span className="text-xs font-medium" style={{ color: "hsl(240 4% 36%)" }}>
           {label}
         </span>
       </div>
-      <div className="text-3xl font-bold tabular-nums" style={{ color: "hsl(0 0% 97%)" }}>
+      <div className="text-3xl font-bold tabular-nums" style={{ color: "hsl(0 0% 99%)" }}>
         {value}
       </div>
       {sub && (
-        <p className="text-xs mt-1" style={{ color: "hsl(240 4% 45%)" }}>
+        <p className="text-xs mt-1" style={{ color: "hsl(240 4% 32%)" }}>
           {sub}
         </p>
       )}
@@ -74,25 +74,30 @@ function StreakChip({ habit }: { habit: HabitWithData }) {
   return (
     <Link href={`/habits/${habit.id}`}>
       <div
-        className="flex items-center gap-2.5 rounded-xl border px-4 py-3 transition-all hover:brightness-110 cursor-pointer"
+        className="flex items-center gap-2.5 rounded-xl border px-4 py-3 cursor-pointer"
         style={{
           backgroundColor: "hsl(240 7% 10%)",
           borderColor: "hsl(240 4% 17%)",
           boxShadow: "0 1px 8px hsl(240 10% 3% / 0.3)",
+          transition: "transform 120ms ease, filter 120ms ease",
         }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.filter = "brightness(1.12)"; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.filter = "none"; }}
+        onMouseDown={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(0.97)"; }}
+        onMouseUp={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
       >
         <span className="text-base">{habit.emoji}</span>
         <div>
-          <div className="text-xs font-medium" style={{ color: "hsl(0 0% 90%)" }}>
+          <div className="text-xs font-medium" style={{ color: "hsl(0 0% 68%)" }}>
             {habit.name}
           </div>
           <div className="flex items-center gap-1 mt-0.5">
             <Flame className="h-3 w-3" style={{ color: streakColor }} />
-            <span className="text-xs font-bold" style={{ color: streakColor }}>
+            <span className="text-sm font-bold tabular-nums" style={{ color: streakColor }}>
               {habit.streak.currentStreak}
             </span>
-            <span className="text-xs" style={{ color: "hsl(240 4% 45%)" }}>
-              days
+            <span className="text-xs" style={{ color: "hsl(240 4% 38%)" }}>
+              d
             </span>
           </div>
         </div>
@@ -365,7 +370,7 @@ export default function DashboardPage() {
     : null;
 
   return (
-    <div className="space-y-8 pb-8">
+    <div className="space-y-8 pb-12">
       {/* Page-level confetti */}
       {reward.confetti && (
         <ConfettiBurst
@@ -443,7 +448,7 @@ export default function DashboardPage() {
                 >
                   {data?.todayProgress.completed}
                 </span>
-                <span className="text-xl" style={{ color: "hsl(262 50% 65%)" }}>
+                <span className="text-xl" style={{ color: "hsl(262 40% 55%)" }}>
                   / {data?.todayProgress.total}
                 </span>
               </div>
@@ -485,6 +490,7 @@ export default function DashboardPage() {
                   pct === 100
                     ? "#4ade80"
                     : "linear-gradient(90deg, #8b5cf6, #6366f1)",
+                boxShadow: pct === 100 ? "0 0 8px #4ade8080" : "none",
               }}
             />
           </div>

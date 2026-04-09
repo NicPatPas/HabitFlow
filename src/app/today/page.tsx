@@ -80,7 +80,7 @@ export default function TodayPage() {
   );
 
   return (
-    <div className="space-y-8 pb-8">
+    <div className="space-y-8 pb-12">
       {/* Page-level confetti (survives re-renders) */}
       {reward.confetti && (
         <ConfettiBurst
@@ -128,7 +128,7 @@ export default function TodayPage() {
                   >
                     {done}
                   </span>
-                  <span className="text-xl" style={{ color: "hsl(262 50% 65%)" }}>
+                  <span className="text-xl" style={{ color: "hsl(262 40% 55%)" }}>
                     / {habits.length}
                   </span>
                 </div>
@@ -341,26 +341,37 @@ function HabitRow({ habit, onClick, justCompleted, onBurstDone }: HabitRowProps)
 
   return (
     <div
-      className="rounded-2xl border overflow-hidden cursor-pointer transition-all duration-150"
+      className="rounded-2xl border overflow-hidden cursor-pointer"
       style={{
-        backgroundColor: "hsl(240 7% 9%)",
-        borderColor: justCompleted ? `${habit.color}50` : "hsl(240 4% 16%)",
+        background: isDone
+          ? `linear-gradient(90deg, ${habit.color}07 0%, hsl(240 7% 9%) 45%)`
+          : "hsl(240 7% 9%)",
+        borderColor: justCompleted
+          ? `${habit.color}50`
+          : isDone
+          ? `${habit.color}22`
+          : "hsl(240 4% 16%)",
         boxShadow: justCompleted
           ? `0 0 0 1px ${habit.color}20, 0 4px 24px ${habit.color}18`
           : "0 2px 12px hsl(240 10% 3% / 0.3)",
         position: "relative",
+        transition: "transform 120ms ease, filter 120ms ease",
       }}
       onClick={onClick}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = `${habit.color}45`;
-        (e.currentTarget as HTMLElement).style.backgroundColor = "hsl(240 7% 11%)";
+        (e.currentTarget as HTMLElement).style.filter = "brightness(1.06)";
+        (e.currentTarget as HTMLElement).style.borderColor = `${habit.color}38`;
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.borderColor = justCompleted
+        (e.currentTarget as HTMLElement).style.filter = "none";
+        (e.currentTarget as HTMLElement).style.borderColor = isDone
+          ? `${habit.color}22`
+          : justCompleted
           ? `${habit.color}50`
           : "hsl(240 4% 16%)";
-        (e.currentTarget as HTMLElement).style.backgroundColor = "hsl(240 7% 9%)";
       }}
+      onMouseDown={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(0.99)"; }}
+      onMouseUp={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
     >
       {/* Spark burst overlay */}
       {justCompleted && (

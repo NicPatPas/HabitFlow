@@ -34,12 +34,12 @@ export function Navigation() {
       >
         <div className="flex items-center gap-2.5">
           <Image src="/logo.svg" alt="HabitFlow" width={28} height={28} />
-          <span className="font-bold text-base tracking-tight">HabitFlow</span>
+          <span className="font-bold text-base" style={{ letterSpacing: "-0.02em" }}>HabitFlow</span>
         </div>
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2 rounded-lg transition-colors"
-          style={{ backgroundColor: mobileOpen ? "hsl(var(--muted))" : "transparent" }}
+          className="p-2.5 rounded-xl transition-all active:scale-90"
+          style={{ backgroundColor: mobileOpen ? "hsl(240 6% 14%)" : "transparent" }}
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
