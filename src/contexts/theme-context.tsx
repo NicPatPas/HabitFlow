@@ -112,5 +112,6 @@ const LIGHT_TOKENS: typeof DARK_TOKENS = {
 
 export function useColors() {
   const { isDark } = useTheme();
-  return isDark ? DARK_TOKENS : LIGHT_TOKENS;
+  const tokens = isDark ? DARK_TOKENS : LIGHT_TOKENS;
+  return { ...tokens, isDark };
 }

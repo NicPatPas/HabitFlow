@@ -321,7 +321,7 @@ export default function DashboardPage() {
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-10 pb-16">
       {/* Onboarding overlay */}
       {showOnboarding && (
         <OnboardingFlow onComplete={handleOnboardingComplete} onSkip={dismissOnboarding} />
@@ -362,40 +362,70 @@ export default function DashboardPage() {
       {loading ? (
         <Skeleton className="h-28 rounded-2xl" />
       ) : (
-        <div
-          className="rounded-2xl p-6 relative overflow-hidden border"
-          style={{
-            background: "linear-gradient(135deg, hsl(262 60% 12%), hsl(240 40% 10%))",
-            borderColor: "hsl(262 35% 18%)",
-            boxShadow: "0 4px 32px hsl(262 60% 10% / 0.5)",
-          }}
-        >
-          <div className="absolute inset-0 opacity-25" style={{ background: "radial-gradient(circle at 80% 50%, hsl(262 80% 65% / 0.4), transparent 60%)" }} />
-          <div className="relative flex items-center justify-between">
-            <div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-5xl font-bold tabular-nums" style={{ color: "hsl(0 0% 97%)" }}>
-                  {data?.todayProgress.completed}
-                </span>
-                <span className="text-xl" style={{ color: "hsl(262 40% 55%)" }}>/ {data?.todayProgress.total}</span>
-              </div>
-              <p className="text-sm mt-1" style={{ color: "hsl(262 35% 65%)" }}>habits done today</p>
-            </div>
-            <div className="text-right">
-              <div className="text-4xl font-bold tabular-nums" style={{ color: pct === 100 ? "#4ade80" : "hsl(262 80% 78%)" }}>{pct}%</div>
-              {pct === 100 && <div className="text-xs font-medium mt-0.5" style={{ color: "#4ade80" }}>Perfect day 🎉</div>}
-              {pct > 0 && pct < 100 && <div className="text-xs mt-0.5" style={{ color: "hsl(262 35% 60%)" }}>{pendingHabits.length} left</div>}
-            </div>
-          </div>
-          <div className="mt-5 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "hsl(262 40% 18%)" }}>
+        <div style={{ paddingBottom: "0.5rem" }}>
+          <div
+            className="rounded-2xl p-6 relative overflow-hidden border"
+            style={{
+              background: c.isDark
+                ? "linear-gradient(135deg, hsl(262 60% 12%), hsl(240 40% 10%))"
+                : "linear-gradient(135deg, hsl(262 85% 96%), hsl(240 60% 94%))",
+              borderColor: c.isDark ? "hsl(262 35% 18%)" : "hsl(262 60% 88%)",
+              boxShadow: c.isDark
+                ? "0 4px 32px hsl(262 60% 10% / 0.5)"
+                : "0 4px 24px hsl(262 60% 80% / 0.25)",
+            }}
+          >
             <div
-              className="h-full rounded-full transition-all duration-1000"
-              style={{
-                width: `${pct}%`,
-                background: pct === 100 ? "#4ade80" : "linear-gradient(90deg, #8b5cf6, #6366f1)",
-                boxShadow: pct === 100 ? "0 0 8px #4ade8080" : "none",
-              }}
+              className="absolute inset-0 opacity-25"
+              style={{ background: "radial-gradient(circle at 80% 50%, hsl(262 80% 65% / 0.3), transparent 60%)" }}
             />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className="text-5xl font-bold tabular-nums"
+                    style={{ color: c.isDark ? "hsl(0 0% 97%)" : "hsl(262 50% 25%)" }}
+                  >
+                    {data?.todayProgress.completed}
+                  </span>
+                  <span className="text-xl" style={{ color: c.isDark ? "hsl(262 40% 55%)" : "hsl(262 40% 50%)" }}>
+                    / {data?.todayProgress.total}
+                  </span>
+                </div>
+                <p className="text-sm mt-1" style={{ color: c.isDark ? "hsl(262 35% 65%)" : "hsl(262 35% 45%)" }}>
+                  habits done today
+                </p>
+              </div>
+              <div className="text-right">
+                <div
+                  className="text-4xl font-bold tabular-nums"
+                  style={{ color: pct === 100 ? "#16a34a" : c.isDark ? "hsl(262 80% 78%)" : "hsl(262 60% 45%)" }}
+                >
+                  {pct}%
+                </div>
+                {pct === 100 && (
+                  <div className="text-xs font-medium mt-0.5" style={{ color: "#16a34a" }}>Perfect day 🎉</div>
+                )}
+                {pct > 0 && pct < 100 && (
+                  <div className="text-xs mt-0.5" style={{ color: c.isDark ? "hsl(262 35% 60%)" : "hsl(262 35% 48%)" }}>
+                    {pendingHabits.length} left
+                  </div>
+                )}
+              </div>
+            </div>
+            <div
+              className="mt-5 h-1.5 rounded-full overflow-hidden"
+              style={{ backgroundColor: c.isDark ? "hsl(262 40% 18%)" : "hsl(262 40% 86%)" }}
+            >
+              <div
+                className="h-full rounded-full transition-all duration-1000"
+                style={{
+                  width: `${pct}%`,
+                  background: pct === 100 ? "#16a34a" : "linear-gradient(90deg, #8b5cf6, #6366f1)",
+                  boxShadow: pct === 100 ? "0 0 8px #16a34a60" : "none",
+                }}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -404,11 +434,13 @@ export default function DashboardPage() {
       {loading ? (
         <Skeleton className="h-36 rounded-2xl" />
       ) : nextAction ? (
-        <NextBestActionCard
-          action={nextAction}
-          onQuickAction={async (habitId, d) => { await handleCheckIn(habitId, d); }}
-          onOpenModal={() => { const h = data?.habits.find((x) => x.id === nextAction.habit.id); if (h) setCheckInHabit(h); }}
-        />
+        <div style={{ paddingBottom: "0.5rem" }}>
+          <NextBestActionCard
+            action={nextAction}
+            onQuickAction={async (habitId, d) => { await handleCheckIn(habitId, d); }}
+            onOpenModal={() => { const h = data?.habits.find((x) => x.id === nextAction.habit.id); if (h) setCheckInHabit(h); }}
+          />
+        </div>
       ) : null}
 
       {/* Stats grid */}
@@ -471,7 +503,9 @@ export default function DashboardPage() {
 
       {/* Achievements */}
       {!loading && achievements.length > 0 && (
-        <AchievementsCard achievements={achievements} />
+        <div style={{ paddingTop: "0.75rem" }}>
+          <AchievementsCard achievements={achievements} />
+        </div>
       )}
 
       {/* Perfect Day */}

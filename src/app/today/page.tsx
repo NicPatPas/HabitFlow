@@ -82,7 +82,7 @@ export default function TodayPage() {
   );
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-10 pb-16">
       {/* Page-level confetti (survives re-renders) */}
       {reward.confetti && (
         <ConfettiBurst

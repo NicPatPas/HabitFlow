@@ -11,22 +11,24 @@ import { format, parseISO, subDays } from "date-fns";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from "recharts";
+import { useColors } from "@/contexts/theme-context";
 import type { Habit, HabitCheckIn } from "@prisma/client";
-
-const CHART_TOOLTIP_STYLE = {
-  backgroundColor: "hsl(240 8% 10%)",
-  border: "1px solid hsl(240 5% 18%)",
-  borderRadius: "10px",
-  fontSize: 12,
-  color: "hsl(0 0% 90%)",
-};
 
 export default function HabitDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const c = useColors();
   const router = useRouter();
   const [habit, setHabit] = useState<(Habit & { checkIns: HabitCheckIn[] }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkInOpen, setCheckInOpen] = useState(false);
+
+  const CHART_TOOLTIP_STYLE = {
+    backgroundColor: c.tooltipBg,
+    border: `1px solid ${c.tooltipBorder}`,
+    borderRadius: "10px",
+    fontSize: 12,
+    color: c.tooltipText,
+  };
 
   async function loadHabit() {
     const res = await fetch(`/api/habits/${id}`);
@@ -87,15 +89,15 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
   ];
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-10 pb-16">
       {/* Header */}
       <div className="flex items-start gap-3 pt-1">
         <button
           onClick={() => router.back()}
           className="mt-1 p-2 rounded-xl transition-all hover:brightness-110"
-          style={{ backgroundColor: "hsl(240 8% 7%)", border: "1px solid hsl(240 5% 14%)" }}
+          style={{ backgroundColor: c.bgCard, border: `1px solid ${c.borderInput}` }}
         >
-          <ArrowLeft className="h-4 w-4" style={{ color: "hsl(var(--muted-foreground))" }} />
+          <ArrowLeft className="h-4 w-4" style={{ color: c.textMuted }} />
         </button>
         <div className="flex-1 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -104,8 +106,8 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
               {habit.emoji}
             </div>
             <div>
-              <h1 className="text-xl font-bold" style={{ color: "hsl(0 0% 95%)" }}>{habit.name}</h1>
-              <div className="flex items-center gap-2 text-xs mt-0.5" style={{ color: "hsl(var(--muted-foreground))" }}>
+              <h1 className="text-xl font-bold" style={{ color: c.text }}>{habit.name}</h1>
+              <div className="flex items-center gap-2 text-xs mt-0.5" style={{ color: c.textMuted }}>
                 <span>{FREQUENCY_LABELS[habit.frequencyType]}</span>
                 {habit.targetValue && <span>· {habit.targetValue} {habit.targetUnit}</span>}
                 <span>· {DIFFICULTY_LABELS[habit.difficulty]}</span>
@@ -126,36 +128,32 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
       <div className="grid grid-cols-2 gap-4">
         {statCards.map(({ label, value, unit, icon, accent }) => (
           <div key={label} className="rounded-2xl border p-5"
-            style={{
-              backgroundColor: "hsl(240 7% 9%)",
-              borderColor: "hsl(240 4% 16%)",
-              boxShadow: "0 2px 16px hsl(240 10% 3% / 0.5)",
-            }}>
+            style={{ backgroundColor: c.bgCard, borderColor: c.border, boxShadow: c.shadow }}>
             <div className="flex items-center gap-2 mb-3">
               <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${accent}15` }}>
                 {icon}
               </div>
-              <span className="text-xs font-medium" style={{ color: "hsl(240 4% 42%)" }}>{label}</span>
+              <span className="text-xs font-medium" style={{ color: c.textDim }}>{label}</span>
             </div>
-            <div className="text-3xl font-bold tabular-nums" style={{ color: "hsl(0 0% 97%)" }}>{value}</div>
-            <div className="text-xs mt-1" style={{ color: "hsl(240 4% 40%)" }}>{unit}</div>
+            <div className="text-3xl font-bold tabular-nums" style={{ color: c.text }}>{value}</div>
+            <div className="text-xs mt-1" style={{ color: c.textMuted }}>{unit}</div>
           </div>
         ))}
       </div>
 
       {/* Day of week chart */}
       <div className="rounded-2xl border overflow-hidden"
-        style={{ backgroundColor: "hsl(240 7% 9%)", borderColor: "hsl(240 4% 16%)" }}>
-        <div className="px-6 pt-5 pb-4 flex items-center gap-2 border-b" style={{ borderColor: "hsl(240 5% 12%)" }}>
-          <BarChart2 className="h-4 w-4" style={{ color: "hsl(var(--muted-foreground))" }} />
-          <h2 className="text-sm font-semibold" style={{ color: "hsl(0 0% 90%)" }}>Success by Day of Week</h2>
+        style={{ backgroundColor: c.bgCard, borderColor: c.border }}>
+        <div className="px-6 pt-5 pb-4 flex items-center gap-2 border-b" style={{ borderColor: c.borderSubtle }}>
+          <BarChart2 className="h-4 w-4" style={{ color: c.textMuted }} />
+          <h2 className="text-sm font-semibold" style={{ color: c.text }}>Success by Day of Week</h2>
         </div>
         <div className="p-6">
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={dowStats} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 5% 14%)" />
-              <XAxis dataKey="day" tick={{ fontSize: 11, fill: "hsl(240 4% 52%)" }} />
-              <YAxis tick={{ fontSize: 11, fill: "hsl(240 4% 52%)" }} domain={[0, 100]} />
+              <CartesianGrid strokeDasharray="3 3" stroke={c.chartGrid} />
+              <XAxis dataKey="day" tick={{ fontSize: 11, fill: c.chartTick }} />
+              <YAxis tick={{ fontSize: 11, fill: c.chartTick }} domain={[0, 100]} />
               <Tooltip formatter={(v) => [`${v}%`, "Rate"]} contentStyle={CHART_TOOLTIP_STYLE} />
               <Bar dataKey="completionRate" radius={[4, 4, 0, 0]}>
                 {dowStats.map((entry, i) => (
@@ -169,10 +167,10 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
 
       {/* Last 30 days heatmap */}
       <div className="rounded-2xl border overflow-hidden"
-        style={{ backgroundColor: "hsl(240 7% 9%)", borderColor: "hsl(240 4% 16%)" }}>
-        <div className="px-6 pt-5 pb-4 flex items-center gap-2 border-b" style={{ borderColor: "hsl(240 5% 12%)" }}>
-          <Calendar className="h-4 w-4" style={{ color: "hsl(var(--muted-foreground))" }} />
-          <h2 className="text-sm font-semibold" style={{ color: "hsl(0 0% 90%)" }}>Last 30 Days</h2>
+        style={{ backgroundColor: c.bgCard, borderColor: c.border }}>
+        <div className="px-6 pt-5 pb-4 flex items-center gap-2 border-b" style={{ borderColor: c.borderSubtle }}>
+          <Calendar className="h-4 w-4" style={{ color: c.textMuted }} />
+          <h2 className="text-sm font-semibold" style={{ color: c.text }}>Last 30 Days</h2>
         </div>
         <div className="p-6">
           <div className="flex flex-wrap gap-1.5">
@@ -183,7 +181,7 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
                   key={date}
                   title={`${format(parseISO(date), "MMM d")}: ${status ?? "no check-in"}`}
                   className="h-7 w-7 rounded-lg transition-all hover:opacity-80 cursor-default flex items-center justify-center"
-                  style={{ backgroundColor: cfg ? `${cfg.color}25` : "hsl(240 6% 11%)", border: `1px solid ${cfg ? `${cfg.color}40` : "hsl(240 5% 16%)"}` }}
+                  style={{ backgroundColor: cfg ? `${cfg.color}25` : c.bgSubtle, border: `1px solid ${cfg ? `${cfg.color}40` : c.borderInput}` }}
                 >
                   {cfg && <span className="text-xs">{cfg.icon}</span>}
                 </div>
@@ -192,13 +190,13 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
           </div>
           <div className="flex items-center gap-4 mt-3 flex-wrap">
             {Object.entries(STATUS_CONFIG).map(([s, cfg]) => (
-              <div key={s} className="flex items-center gap-1.5 text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
+              <div key={s} className="flex items-center gap-1.5 text-xs" style={{ color: c.textMuted }}>
                 <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: cfg.color }} />
                 {cfg.label}
               </div>
             ))}
-            <div className="flex items-center gap-1.5 text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
-              <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: "hsl(240 6% 11%)" }} />
+            <div className="flex items-center gap-1.5 text-xs" style={{ color: c.textMuted }}>
+              <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: c.bgSubtle }} />
               No check-in
             </div>
           </div>
@@ -207,29 +205,29 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
 
       {/* Recent activity */}
       <div className="rounded-2xl border overflow-hidden"
-        style={{ backgroundColor: "hsl(240 7% 9%)", borderColor: "hsl(240 4% 16%)" }}>
-        <div className="px-6 pt-5 pb-4 border-b" style={{ borderColor: "hsl(240 5% 12%)" }}>
-          <h2 className="text-sm font-semibold" style={{ color: "hsl(0 0% 90%)" }}>Recent Activity</h2>
+        style={{ backgroundColor: c.bgCard, borderColor: c.border }}>
+        <div className="px-6 pt-5 pb-4 border-b" style={{ borderColor: c.borderSubtle }}>
+          <h2 className="text-sm font-semibold" style={{ color: c.text }}>Recent Activity</h2>
         </div>
-        <div className="divide-y" style={{ borderColor: "hsl(240 5% 12%)" }}>
+        <div className="divide-y" style={{ borderColor: c.borderSubtle }}>
           {habit.checkIns.slice(0, 10).map((ci) => {
             const cfg = STATUS_CONFIG[ci.status];
             return (
               <div key={ci.id} className="flex items-center justify-between px-6 py-4">
                 <div className="flex items-center gap-3">
                   <span className="text-base">{cfg.icon}</span>
-                  <span className="text-sm" style={{ color: "hsl(0 0% 85%)" }}>
+                  <span className="text-sm" style={{ color: c.text2 }}>
                     {format(parseISO(ci.date), "MMM d, yyyy")}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   {ci.valueCompleted != null && (
-                    <span className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
+                    <span className="text-xs" style={{ color: c.textMuted }}>
                       {ci.valueCompleted}/{ci.targetValueSnapshot} {habit.targetUnit}
                     </span>
                   )}
                   {ci.notes && (
-                    <span className="text-xs italic max-w-[120px] truncate" style={{ color: "hsl(var(--muted-foreground))" }}>
+                    <span className="text-xs italic max-w-[120px] truncate" style={{ color: c.textMuted }}>
                       {ci.notes}
                     </span>
                   )}
@@ -242,7 +240,7 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
             );
           })}
           {habit.checkIns.length === 0 && (
-            <p className="text-sm text-center py-8" style={{ color: "hsl(var(--muted-foreground))" }}>
+            <p className="text-sm text-center py-8" style={{ color: c.textMuted }}>
               No check-ins yet.
             </p>
           )}

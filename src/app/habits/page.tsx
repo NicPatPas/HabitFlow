@@ -76,7 +76,7 @@ export default function HabitsPage() {
   const onStreak = habits.filter((h) => h.streak.currentStreak > 0).length;
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-10 pb-16">
       {templateOpen && (
         <OnboardingFlow onComplete={handleTemplateComplete} onSkip={() => setTemplateOpen(false)} />
       )}

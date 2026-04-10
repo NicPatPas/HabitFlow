@@ -92,7 +92,7 @@ export default function AnalyticsPage() {
   }, []);
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-10 pb-16">
       {/* Header */}
       <div className="pt-1">
         <h1 className="text-xl font-bold tracking-tight" style={{ color: c.text }}>Analytics</h1>
