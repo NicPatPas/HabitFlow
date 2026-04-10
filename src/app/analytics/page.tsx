@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, Flame, Target, Activity, BarChart3, Calendar } from "lucide-react";
+import { useColors, useTheme } from "@/contexts/theme-context";
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell, ReferenceLine,
@@ -25,59 +26,42 @@ type AnalyticsData = {
   totalHabits: number;
 };
 
-const HEATMAP_COLORS = [
-  "hsl(240 6% 13%)",
-  "#1e3a2f",
-  "#166534",
-  "#16a34a",
-  "#4ade80",
-];
+const HEATMAP_DARK  = ["hsl(240 6% 13%)", "#1e3a2f", "#166534", "#16a34a", "#4ade80"];
+const HEATMAP_LIGHT = ["hsl(220 13% 90%)", "#dcfce7", "#bbf7d0", "#4ade80", "#16a34a"];
 
-const CHART_TOOLTIP_STYLE = {
-  backgroundColor: "hsl(240 8% 10%)",
-  border: "1px solid hsl(240 5% 18%)",
-  borderRadius: "10px",
-  fontSize: 12,
-  color: "hsl(0 0% 90%)",
-};
+// Note: CHART_TOOLTIP_STYLE is built dynamically inside the component using useColors()
 
 const TABS = ["weekly", "daily", "dow", "heatmap"] as const;
 type Tab = typeof TABS[number];
 const TAB_LABELS: Record<Tab, string> = { weekly: "Weekly", daily: "30 Days", dow: "By Day", heatmap: "Heatmap" };
 
 function StatCard({ icon, label, value, accent, sub }: { icon: React.ReactNode; label: string; value: string; accent: string; sub?: string }) {
+  const c = useColors();
   return (
     <div className="rounded-2xl border p-5"
-      style={{
-        backgroundColor: "hsl(240 7% 9%)",
-        borderColor: "hsl(240 4% 16%)",
-        boxShadow: "0 2px 16px hsl(240 10% 3% / 0.5)",
-      }}>
+      style={{ backgroundColor: c.bgCard, borderColor: c.border, boxShadow: c.shadow }}>
       <div className="flex items-center gap-2 mb-3">
         <div className="h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${accent}15` }}>
           {icon}
         </div>
-        <span className="text-xs font-medium" style={{ color: "hsl(240 4% 36%)" }}>{label}</span>
+        <span className="text-xs font-medium" style={{ color: c.textDim }}>{label}</span>
       </div>
-      <div className="text-3xl font-bold tabular-nums" style={{ color: "hsl(0 0% 99%)" }}>{value}</div>
-      {sub && <p className="text-xs mt-1" style={{ color: "hsl(240 4% 30%)" }}>{sub}</p>}
+      <div className="text-3xl font-bold tabular-nums" style={{ color: c.text }}>{value}</div>
+      {sub && <p className="text-xs mt-1" style={{ color: c.textDimmer }}>{sub}</p>}
     </div>
   );
 }
 
 function ChartCard({ title, icon, subtitle, children }: { title: string; icon: React.ReactNode; subtitle?: string; children: React.ReactNode }) {
+  const c = useColors();
   return (
     <div className="rounded-2xl border overflow-hidden"
-      style={{
-        backgroundColor: "hsl(240 7% 9%)",
-        borderColor: "hsl(240 4% 16%)",
-        boxShadow: "0 2px 16px hsl(240 10% 3% / 0.4)",
-      }}>
-      <div className="px-6 pt-5 pb-4 flex items-center gap-2.5 border-b" style={{ borderColor: "hsl(240 4% 13%)" }}>
-        <span style={{ color: "hsl(240 4% 40%)" }}>{icon}</span>
+      style={{ backgroundColor: c.bgCard, borderColor: c.border, boxShadow: c.shadowChart }}>
+      <div className="px-6 pt-5 pb-4 flex items-center gap-2.5 border-b" style={{ borderColor: c.borderSubtle }}>
+        <span style={{ color: c.textMuted }}>{icon}</span>
         <div>
-          <h2 className="text-sm font-semibold" style={{ color: "hsl(0 0% 92%)" }}>{title}</h2>
-          {subtitle && <p className="text-xs mt-0.5" style={{ color: "hsl(240 4% 34%)" }}>{subtitle}</p>}
+          <h2 className="text-sm font-semibold" style={{ color: c.text }}>{title}</h2>
+          {subtitle && <p className="text-xs mt-0.5" style={{ color: c.textDim }}>{subtitle}</p>}
         </div>
       </div>
       <div className="p-6">{children}</div>
@@ -86,9 +70,20 @@ function ChartCard({ title, icon, subtitle, children }: { title: string; icon: R
 }
 
 export default function AnalyticsPage() {
+  const c = useColors();
+  const { isDark } = useTheme();
+  const HEATMAP_COLORS = isDark ? HEATMAP_DARK : HEATMAP_LIGHT;
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("weekly");
+
+  const CHART_TOOLTIP_STYLE = {
+    backgroundColor: c.tooltipBg,
+    border: `1px solid ${c.tooltipBorder}`,
+    borderRadius: "10px",
+    fontSize: 12,
+    color: c.tooltipText,
+  };
 
   useEffect(() => {
     fetch("/api/analytics")
@@ -100,8 +95,8 @@ export default function AnalyticsPage() {
     <div className="space-y-8 pb-12">
       {/* Header */}
       <div className="pt-1">
-        <h1 className="text-xl font-bold tracking-tight" style={{ color: "hsl(0 0% 95%)" }}>Analytics</h1>
-        <p className="text-sm mt-0.5" style={{ color: "hsl(var(--muted-foreground))" }}>
+        <h1 className="text-xl font-bold tracking-tight" style={{ color: c.text }}>Analytics</h1>
+        <p className="text-sm mt-0.5" style={{ color: c.textMuted }}>
           Your habit performance over time
         </p>
       </div>
@@ -124,7 +119,7 @@ export default function AnalyticsPage() {
       {!loading && data && (
         <div className="rounded-2xl border p-5"
           style={{
-            background: "linear-gradient(135deg, hsl(25 70% 9%), hsl(40 50% 7%))",
+            background: `linear-gradient(135deg, hsl(25 70% 9%), hsl(40 50% 7%))`,
             borderColor: "hsl(25 35% 16%)",
             boxShadow: "0 2px 20px hsl(25 60% 8% / 0.5)",
           }}>
@@ -141,7 +136,7 @@ export default function AnalyticsPage() {
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="text-3xl font-bold tabular-nums" style={{ color: "#f97316" }}>{value}</div>
-                <div className="text-xs mt-1" style={{ color: "hsl(25 15% 38%)" }}>{label}</div>
+                <div className="text-xs mt-1" style={{ color: "hsl(25 15% 42%)" }}>{label}</div>
               </div>
             ))}
           </div>
@@ -149,16 +144,16 @@ export default function AnalyticsPage() {
       )}
 
       {/* Tab navigation */}
-      <div className="flex gap-1 p-1 rounded-2xl" style={{ backgroundColor: "hsl(240 8% 10%)", border: "1px solid hsl(240 5% 18%)" }}>
+      <div className="flex gap-1 p-1 rounded-2xl" style={{ backgroundColor: c.bgTab, border: `1px solid ${c.tabBorder}` }}>
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap"
             style={{
-              backgroundColor: tab === t ? "hsl(262 80% 65% / 0.15)" : "transparent",
-              color: tab === t ? "hsl(262 80% 72%)" : "hsl(var(--muted-foreground))",
-              boxShadow: tab === t ? "inset 0 0 0 1px hsl(262 80% 65% / 0.3)" : "none",
+              backgroundColor: tab === t ? c.tabActiveBg : "transparent",
+              color: tab === t ? c.tabActiveText : c.textMuted,
+              boxShadow: tab === t ? `inset 0 0 0 1px hsl(262 80% 65% / 0.3)` : "none",
             }}
           >
             {TAB_LABELS[t]}
@@ -172,9 +167,9 @@ export default function AnalyticsPage() {
           {loading ? <Skeleton className="h-64" /> : (
             <ResponsiveContainer width="100%" height={260}>
               <LineChart data={data?.weeklyChart} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 5% 14%)" />
-                <XAxis dataKey="week" tick={{ fontSize: 11, fill: "hsl(240 4% 52%)" }} />
-                <YAxis tick={{ fontSize: 11, fill: "hsl(240 4% 52%)" }} domain={[0, 100]} />
+                <CartesianGrid strokeDasharray="3 3" stroke={c.chartGrid} />
+                <XAxis dataKey="week" tick={{ fontSize: 11, fill: c.chartTick }} />
+                <YAxis tick={{ fontSize: 11, fill: c.chartTick }} domain={[0, 100]} />
                 <Tooltip formatter={(v) => [`${v}%`, "Completion"]} contentStyle={CHART_TOOLTIP_STYLE} />
                 <ReferenceLine y={80} stroke="#22c55e" strokeDasharray="3 3" strokeOpacity={0.4} />
                 <Line type="monotone" dataKey="completionRate" stroke="#8b5cf6" strokeWidth={2.5}
@@ -190,10 +185,10 @@ export default function AnalyticsPage() {
           {loading ? <Skeleton className="h-64" /> : (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={data?.dailyChart.slice(-30)} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 5% 14%)" />
+                <CartesianGrid strokeDasharray="3 3" stroke={c.chartGrid} />
                 <XAxis dataKey="date" tickFormatter={(d) => d.slice(5)}
-                  tick={{ fontSize: 10, fill: "hsl(240 4% 52%)" }} interval={4} />
-                <YAxis tick={{ fontSize: 11, fill: "hsl(240 4% 52%)" }} />
+                  tick={{ fontSize: 10, fill: c.chartTick }} interval={4} />
+                <YAxis tick={{ fontSize: 11, fill: c.chartTick }} />
                 <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
                 <Bar dataKey="completed" fill="#6366f1" radius={[3, 3, 0, 0]} name="Completed" />
               </BarChart>
@@ -208,9 +203,9 @@ export default function AnalyticsPage() {
             <>
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={data?.dowStats} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 5% 14%)" />
-                  <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(240 4% 52%)" }} />
-                  <YAxis tick={{ fontSize: 11, fill: "hsl(240 4% 52%)" }} domain={[0, 100]} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={c.chartGrid} />
+                  <XAxis dataKey="day" tick={{ fontSize: 12, fill: c.chartTick }} />
+                  <YAxis tick={{ fontSize: 11, fill: c.chartTick }} domain={[0, 100]} />
                   <Tooltip formatter={(v) => [`${v}%`, "Rate"]} contentStyle={CHART_TOOLTIP_STYLE} />
                   <Bar dataKey="completionRate" radius={[4, 4, 0, 0]}>
                     {(data?.dowStats ?? []).map((entry, i) => (
@@ -221,8 +216,8 @@ export default function AnalyticsPage() {
                 </BarChart>
               </ResponsiveContainer>
               {data?.bestDay && (
-                <p className="text-sm text-center mt-3" style={{ color: "hsl(var(--muted-foreground))" }}>
-                  Your best day is <strong style={{ color: "hsl(0 0% 90%)" }}>{data.bestDay}</strong> 🎯
+                <p className="text-sm text-center mt-3" style={{ color: c.textMuted }}>
+                  Your best day is <strong style={{ color: c.text }}>{data.bestDay}</strong> 🎯
                 </p>
               )}
             </>
@@ -244,10 +239,10 @@ export default function AnalyticsPage() {
                   />
                 ))}
               </div>
-              <div className="flex items-center gap-2 mt-3 text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
+              <div className="flex items-center gap-2 mt-3 text-xs" style={{ color: c.textMuted }}>
                 <span>Less</span>
-                {HEATMAP_COLORS.map((c, i) => (
-                  <div key={i} className="h-3 w-3 rounded-sm" style={{ backgroundColor: c }} />
+                {HEATMAP_COLORS.map((col, i) => (
+                  <div key={i} className="h-3 w-3 rounded-sm" style={{ backgroundColor: col }} />
                 ))}
                 <span>More</span>
               </div>

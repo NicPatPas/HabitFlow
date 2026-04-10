@@ -10,12 +10,14 @@ import { ConfettiBurst } from "@/components/animations/confetti-burst";
 import { useReward } from "@/hooks/use-reward";
 import { NextBestActionCard } from "@/components/dashboard/next-best-action-card";
 import { getNextBestAction } from "@/lib/next-best-action";
+import { useColors } from "@/contexts/theme-context";
 import type { Habit, HabitCheckIn } from "@prisma/client";
 import type { StreakResult } from "@/lib/streak";
 
 type HabitWithData = Habit & { streak: StreakResult; todayCheckIn: HabitCheckIn | null };
 
 export default function TodayPage() {
+  const c = useColors();
   const [habits, setHabits] = useState<HabitWithData[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeHabit, setActiveHabit] = useState<HabitWithData | null>(null);
@@ -91,10 +93,10 @@ export default function TodayPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold tracking-tight" style={{ color: "hsl(0 0% 95%)" }}>
+        <h1 className="text-xl font-bold tracking-tight" style={{ color: c.text }}>
           Today
         </h1>
-        <p className="text-sm mt-0.5" style={{ color: "hsl(var(--muted-foreground))" }}>
+        <p className="text-sm mt-0.5" style={{ color: c.textMuted }}>
           {format(new Date(), "EEEE, MMMM d, yyyy")}
         </p>
       </div>
@@ -201,15 +203,12 @@ export default function TodayPage() {
           {pending.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold" style={{ color: "hsl(0 0% 95%)" }}>
+                <h2 className="text-sm font-semibold" style={{ color: c.text }}>
                   Pending
                 </h2>
                 <span
                   className="text-xs px-2 py-0.5 rounded-full"
-                  style={{
-                    color: "hsl(var(--muted-foreground))",
-                    backgroundColor: "hsl(240 6% 11%)",
-                  }}
+                  style={{ color: c.textMuted, backgroundColor: c.bgSubtle }}
                 >
                   {pending.length} left
                 </span>
@@ -233,7 +232,7 @@ export default function TodayPage() {
               <div className="flex items-center justify-between mb-4">
                 <h2
                   className="text-sm font-semibold"
-                  style={{ color: "hsl(var(--muted-foreground))" }}
+                  style={{ color: c.textMuted }}
                 >
                   Completed
                 </h2>
@@ -264,7 +263,7 @@ export default function TodayPage() {
             <div>
               <h2
                 className="text-sm font-semibold mb-4"
-                style={{ color: "hsl(var(--muted-foreground))" }}
+                style={{ color: c.textMuted }}
               >
                 Other
               </h2>
@@ -286,10 +285,10 @@ export default function TodayPage() {
       {!loading && habits.length === 0 && (
         <div className="text-center py-20">
           <div className="text-5xl mb-4">📋</div>
-          <h3 className="text-lg font-semibold mb-2" style={{ color: "hsl(0 0% 95%)" }}>
+          <h3 className="text-lg font-semibold mb-2" style={{ color: c.text }}>
             No habits to track
           </h3>
-          <p className="text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>
+          <p className="text-sm" style={{ color: c.textMuted }}>
             Add habits from the Habits page first.
           </p>
         </div>
@@ -320,6 +319,7 @@ interface HabitRowProps {
 }
 
 function HabitRow({ habit, onClick, justCompleted, onBurstDone }: HabitRowProps) {
+  const c = useColors();
   const ci = habit.todayCheckIn;
   const statusCfg = ci ? STATUS_CONFIG[ci.status] : null;
   const isDone = ci?.status === "DONE" || ci?.status === "PARTIAL";
@@ -344,16 +344,16 @@ function HabitRow({ habit, onClick, justCompleted, onBurstDone }: HabitRowProps)
       className="rounded-2xl border overflow-hidden cursor-pointer"
       style={{
         background: isDone
-          ? `linear-gradient(90deg, ${habit.color}07 0%, hsl(240 7% 9%) 45%)`
-          : "hsl(240 7% 9%)",
+          ? `linear-gradient(90deg, ${habit.color}07 0%, ${c.bgCard} 45%)`
+          : c.bgCard,
         borderColor: justCompleted
           ? `${habit.color}50`
           : isDone
           ? `${habit.color}22`
-          : "hsl(240 4% 16%)",
+          : c.border,
         boxShadow: justCompleted
           ? `0 0 0 1px ${habit.color}20, 0 4px 24px ${habit.color}18`
-          : "0 2px 12px hsl(240 10% 3% / 0.3)",
+          : c.shadow,
         position: "relative",
         transition: "transform 120ms ease, filter 120ms ease",
       }}
@@ -368,7 +368,7 @@ function HabitRow({ habit, onClick, justCompleted, onBurstDone }: HabitRowProps)
           ? `${habit.color}22`
           : justCompleted
           ? `${habit.color}50`
-          : "hsl(240 4% 16%)";
+          : c.border;
       }}
       onMouseDown={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(0.99)"; }}
       onMouseUp={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
@@ -417,7 +417,7 @@ function HabitRow({ habit, onClick, justCompleted, onBurstDone }: HabitRowProps)
             <div
               className="font-semibold text-sm"
               style={{
-                color: isDone ? "hsl(240 4% 40%)" : "hsl(0 0% 95%)",
+                color: isDone ? c.textMuted : c.text,
                 textDecoration: isDone ? "line-through" : "none",
               }}
             >
@@ -425,7 +425,7 @@ function HabitRow({ habit, onClick, justCompleted, onBurstDone }: HabitRowProps)
             </div>
             <div className="flex items-center gap-3 mt-0.5">
               {habit.targetValue && (
-                <span className="text-xs" style={{ color: "hsl(240 4% 42%)" }}>
+                <span className="text-xs" style={{ color: c.textMuted }}>
                   {ci?.valueCompleted != null ? `${ci.valueCompleted}/` : ""}
                   {habit.targetValue} {habit.targetUnit}
                 </span>

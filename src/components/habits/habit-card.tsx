@@ -7,6 +7,7 @@ import { Flame, MoreHorizontal, Edit, Trash2, Target, Zap, Lock } from "lucide-r
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { SparkBurst } from "@/components/animations/spark-burst";
 import { cn } from "@/lib/utils";
+import { useColors } from "@/contexts/theme-context";
 import type { Habit, HabitCheckIn } from "@prisma/client";
 import type { StreakResult } from "@/lib/streak";
 
@@ -24,6 +25,7 @@ interface HabitCardProps {
 }
 
 export function HabitCard({ habit, streak, todayCheckIn, onDelete, onUpdate, onCheckIn, showCheckIn, justCompleted, onBurstDone }: HabitCardProps) {
+  const c = useColors();
   const [editOpen, setEditOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const flamePulse = justCompleted && streak.currentStreak > 0;
@@ -42,15 +44,15 @@ export function HabitCard({ habit, streak, todayCheckIn, onDelete, onUpdate, onC
         className={cn("relative rounded-2xl border transition-all duration-200 overflow-hidden group", isDone && "opacity-60")}
         style={{
           background: isDone && !hovered
-            ? `linear-gradient(90deg, ${habit.color}07 0%, hsl(240 7% 9%) 45%)`
-            : hovered ? "hsl(240 7% 11%)" : "hsl(240 7% 9%)",
+            ? `linear-gradient(90deg, ${habit.color}07 0%, ${c.bgCard} 45%)`
+            : hovered ? c.bgCardHover : c.bgCard,
           borderColor: hovered
             ? `${habit.color}45`
             : justCompleted
             ? `${habit.color}50`
             : isDone
             ? `${habit.color}22`
-            : "hsl(240 4% 16%)",
+            : c.border,
           boxShadow: justCompleted
             ? `0 0 0 1px ${habit.color}20, 0 4px 24px ${habit.color}18`
             : hovered
@@ -83,17 +85,17 @@ export function HabitCard({ habit, streak, todayCheckIn, onDelete, onUpdate, onC
                 <div className="min-w-0">
                   <h3
                     className={cn("font-semibold text-sm leading-snug", isDone && "line-through opacity-40")}
-                    style={{ color: "hsl(0 0% 95%)" }}
+                    style={{ color: c.text }}
                   >
                     {habit.name}
                   </h3>
                   <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                    <span className="text-xs" style={{ color: "hsl(240 4% 42%)" }}>
+                    <span className="text-xs" style={{ color: c.textMuted }}>
                       {FREQUENCY_LABELS[habit.frequencyType]}
                       {habit.frequencyType !== "DAILY" && ` · ${habit.frequencyDays}×/wk`}
                     </span>
                     {habit.targetValue && (
-                      <span className="text-xs flex items-center gap-0.5" style={{ color: "hsl(240 4% 42%)" }}>
+                      <span className="text-xs flex items-center gap-0.5" style={{ color: c.textMuted }}>
                         <Target className="h-3 w-3" />
                         {habit.targetValue} {habit.targetUnit}
                       </span>
@@ -105,7 +107,7 @@ export function HabitCard({ habit, streak, todayCheckIn, onDelete, onUpdate, onC
                   <DropdownMenuTrigger asChild>
                     <button
                       className="rounded-lg p-1.5 transition-all opacity-0 group-hover:opacity-100 flex-shrink-0"
-                      style={{ backgroundColor: "hsl(240 6% 14%)" }}
+                      style={{ backgroundColor: c.bgSubtle }}
                     >
                       <MoreHorizontal className="h-3.5 w-3.5" style={{ color: "hsl(var(--muted-foreground))" }} />
                     </button>
@@ -151,7 +153,7 @@ export function HabitCard({ habit, streak, todayCheckIn, onDelete, onUpdate, onC
                     <Flame
                       className="h-3.5 w-3.5"
                       style={{
-                        color: streakColor ?? "hsl(240 4% 38%)",
+                        color: streakColor ?? c.textDim,
                         opacity: streak.currentStreak === 0 ? 0.3 : 1,
                         animation: flamePulse ? "flamePulseCard 0.65s ease-out" : "none",
                         filter: flamePulse ? "drop-shadow(0 0 5px #f97316)" : "none",
@@ -160,7 +162,7 @@ export function HabitCard({ habit, streak, todayCheckIn, onDelete, onUpdate, onC
                     <span
                       className="text-sm font-bold tabular-nums"
                       style={{
-                        color: streakColor ?? "hsl(240 4% 38%)",
+                        color: streakColor ?? c.textDim,
                         opacity: streak.currentStreak === 0 ? 0.3 : 1,
                       }}
                     >
@@ -168,7 +170,7 @@ export function HabitCard({ habit, streak, todayCheckIn, onDelete, onUpdate, onC
                     </span>
                   </div>
                   {streak.bestStreak > 0 && streak.bestStreak !== streak.currentStreak && (
-                    <div className="flex items-center gap-0.5" style={{ color: "hsl(240 4% 38%)" }}>
+                    <div className="flex items-center gap-0.5" style={{ color: c.textDim }}>
                       <Zap className="h-3 w-3" />
                       <span className="text-xs">best {streak.bestStreak}</span>
                     </div>
@@ -198,7 +200,7 @@ export function HabitCard({ habit, streak, todayCheckIn, onDelete, onUpdate, onC
                 ) : (
                   <span
                     className="text-xs px-2 py-0.5 rounded-full"
-                    style={{ color: "hsl(240 4% 42%)", backgroundColor: "hsl(240 6% 12%)" }}
+                    style={{ color: c.textMuted, backgroundColor: c.bgSubtle }}
                   >
                     {DIFFICULTY_LABELS[habit.difficulty]}
                   </span>

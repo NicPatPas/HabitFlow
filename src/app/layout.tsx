@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/layout/navigation";
+import { ThemeProvider } from "@/contexts/theme-context";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -34,14 +35,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}</style>
       </head>
       <body className={cn(inter.variable, "font-sans antialiased bg-background min-h-screen")}>
-        <div className="flex min-h-screen">
-          <Navigation />
-          <main className="flex-1 min-h-screen">
-            <div className="main-layout-offset max-w-6xl mx-auto">
-              {children}
-            </div>
-          </main>
-        </div>
+        <ThemeProvider>
+          <div className="flex min-h-screen">
+            <Navigation />
+            <main className="flex-1 min-h-screen">
+              <div className="main-layout-offset max-w-6xl mx-auto">
+                {children}
+              </div>
+            </main>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -64,6 +64,29 @@ html {
   color-scheme: dark;
 }
 
+html[data-theme="light"] {
+  color-scheme: light;
+  --background: 220 20% 96%;
+  --foreground: 220 20% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 20% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 20% 10%;
+  --primary: 220 20% 10%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 220 14% 93%;
+  --secondary-foreground: 220 15% 22%;
+  --muted: 220 14% 93%;
+  --muted-foreground: 220 10% 44%;
+  --accent: 220 14% 93%;
+  --accent-foreground: 220 20% 10%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 220 13% 87%;
+  --input: 220 13% 87%;
+  --ring: 220 13% 60%;
+}
+
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));

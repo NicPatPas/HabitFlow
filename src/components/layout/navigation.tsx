@@ -1,11 +1,12 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CheckSquare, ListTodo, BarChart3, Menu, X } from "lucide-react";
+import { LayoutDashboard, CheckSquare, ListTodo, BarChart3, Menu, X, Sun, Moon } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { format } from "date-fns";
+import { useTheme, useColors } from "@/contexts/theme-context";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -18,6 +19,8 @@ export function Navigation() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const today = format(new Date(), "EEE, MMM d");
+  const { toggleTheme, isDark } = useTheme();
+  const c = useColors();
 
   return (
     <>
@@ -25,31 +28,41 @@ export function Navigation() {
       <div
         className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-14 border-b"
         style={{
-          backgroundColor: "hsl(240 10% 4% / 0.95)",
+          backgroundColor: isDark ? "hsl(240 10% 4% / 0.95)" : "hsl(0 0% 100% / 0.95)",
           backdropFilter: "blur(12px)",
-          borderColor: "hsl(var(--border))",
+          borderColor: c.border,
           paddingLeft: "1.25rem",
           paddingRight: "1rem",
         }}
       >
         <div className="flex items-center gap-2.5">
           <Image src="/logo.svg" alt="HabitFlow" width={28} height={28} />
-          <span className="font-bold text-base" style={{ letterSpacing: "-0.02em" }}>HabitFlow</span>
+          <span className="font-bold text-base" style={{ letterSpacing: "-0.02em", color: c.text }}>HabitFlow</span>
         </div>
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2.5 rounded-xl transition-all active:scale-90"
-          style={{ backgroundColor: mobileOpen ? "hsl(240 6% 14%)" : "transparent" }}
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-xl transition-all"
+            style={{ backgroundColor: "transparent", color: c.textMuted }}
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="p-2.5 rounded-xl transition-all active:scale-90"
+            style={{ backgroundColor: mobileOpen ? c.bgCardHover : "transparent", color: c.text }}
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile drawer */}
       {mobileOpen && (
         <div
           className="md:hidden fixed top-14 left-0 right-0 z-40 border-b shadow-2xl"
-          style={{ backgroundColor: "hsl(240 8% 7%)", borderColor: "hsl(var(--border))" }}
+          style={{ backgroundColor: c.bgSidebar, borderColor: c.border }}
         >
           <div className="p-2">
             {navItems.map((item) => {
@@ -62,8 +75,8 @@ export function Navigation() {
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all"
                   style={{
-                    backgroundColor: active ? "hsl(262 80% 65% / 0.15)" : "transparent",
-                    color: active ? "hsl(262 80% 72%)" : "hsl(var(--muted-foreground))",
+                    backgroundColor: active ? c.navActiveBg : "transparent",
+                    color: active ? c.navActiveText : c.textMuted,
                   }}
                 >
                   <Icon className="h-4 w-4" />
@@ -79,8 +92,8 @@ export function Navigation() {
       <aside
         className="hidden md:flex fixed left-0 top-0 h-full w-64 flex-col z-30 border-r"
         style={{
-          backgroundColor: "hsl(240 8% 6%)",
-          borderColor: "hsl(var(--border))",
+          backgroundColor: c.bgSidebar,
+          borderColor: c.border,
         }}
       >
         {/* Logo */}
@@ -88,14 +101,14 @@ export function Navigation() {
           <div className="flex items-center gap-3">
             <Image src="/logo.svg" alt="HabitFlow" width={36} height={36} className="flex-shrink-0" />
             <div>
-              <div className="font-bold text-sm tracking-tight">HabitFlow</div>
-              <div className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>{today}</div>
+              <div className="font-bold text-sm tracking-tight" style={{ color: c.text }}>HabitFlow</div>
+              <div className="text-xs" style={{ color: c.textMuted }}>{today}</div>
             </div>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="mx-4 mb-3 h-px" style={{ backgroundColor: "hsl(var(--border))" }} />
+        <div className="mx-4 mb-3 h-px" style={{ backgroundColor: c.border }} />
 
         {/* Nav */}
         <nav className="flex-1 px-3 space-y-0.5">
@@ -108,19 +121,19 @@ export function Navigation() {
                 href={item.href}
                 className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 group"
                 style={{
-                  backgroundColor: active ? "hsl(262 80% 65% / 0.15)" : "transparent",
-                  color: active ? "hsl(262 80% 72%)" : "hsl(var(--muted-foreground))",
+                  backgroundColor: active ? c.navActiveBg : "transparent",
+                  color: active ? c.navActiveText : c.textMuted,
                 }}
                 onMouseEnter={(e) => {
                   if (!active) {
-                    e.currentTarget.style.backgroundColor = "hsl(240 6% 13%)";
-                    e.currentTarget.style.color = "hsl(0 0% 95%)";
+                    e.currentTarget.style.backgroundColor = c.navHoverBg;
+                    e.currentTarget.style.color = c.navHoverText;
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!active) {
                     e.currentTarget.style.backgroundColor = "transparent";
-                    e.currentTarget.style.color = "hsl(var(--muted-foreground))";
+                    e.currentTarget.style.color = c.textMuted;
                   }
                 }}
               >
@@ -139,7 +152,7 @@ export function Navigation() {
 
         {/* Footer */}
         <div className="p-4 mt-auto">
-          <div className="mx-0 mb-3 h-px" style={{ backgroundColor: "hsl(var(--border))" }} />
+          <div className="mx-0 mb-3 h-px" style={{ backgroundColor: c.border }} />
           <div className="flex items-center gap-3 px-2 py-1.5 rounded-lg">
             <div
               className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
@@ -147,12 +160,21 @@ export function Navigation() {
             >
               D
             </div>
-            <div>
-              <div className="text-sm font-medium">Demo User</div>
-              <div className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium" style={{ color: c.text }}>Demo User</div>
+              <div className="text-xs" style={{ color: c.textMuted }}>
                 6 active habits
               </div>
             </div>
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg transition-all hover:scale-105"
+              style={{ backgroundColor: c.bgSubtle, color: c.textMuted }}
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            </button>
           </div>
         </div>
       </aside>
