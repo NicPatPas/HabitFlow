@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { HabitForm } from "./habit-form";
 import { STATUS_CONFIG, DIFFICULTY_LABELS, FREQUENCY_LABELS, type HabitFormData } from "@/types";
-import { Flame, MoreHorizontal, Edit, Trash2, Target, Zap, Lock } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Flame, Edit, Trash2, Target, Zap, Lock, BarChart2 } from "lucide-react";
 import { SparkBurst } from "@/components/animations/spark-burst";
 import { cn } from "@/lib/utils";
 import { useColors } from "@/contexts/theme-context";
@@ -103,27 +103,8 @@ export function HabitCard({ habit, streak, todayCheckIn, onDelete, onUpdate, onC
                   </div>
                 </div>
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="rounded-lg p-1.5 transition-all opacity-0 group-hover:opacity-100 flex-shrink-0"
-                      style={{ backgroundColor: c.bgSubtle }}
-                    >
-                      <MoreHorizontal className="h-3.5 w-3.5" style={{ color: "hsl(var(--muted-foreground))" }} />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-36">
-                    <DropdownMenuItem onClick={() => setEditOpen(true)}>
-                      <Edit className="h-4 w-4 mr-2" /> Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDelete(habit.id)}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" /> Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                {/* spacer - no top-right menu anymore */}
+                <div />
               </div>
 
               {/* Progress bar */}
@@ -208,6 +189,37 @@ export function HabitCard({ habit, streak, todayCheckIn, onDelete, onUpdate, onC
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Action footer */}
+        <div
+          className="flex items-center gap-2 px-4 py-2.5"
+          style={{ borderTop: `1px solid ${c.border}`, backgroundColor: c.isDark ? "hsl(240 7% 7%)" : "hsl(220 20% 97%)" }}
+        >
+          <Link
+            href={`/habits/${habit.id}`}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all hover:brightness-110 active:scale-95"
+            style={{ backgroundColor: `${habit.color}18`, color: habit.color, border: `1px solid ${habit.color}30` }}
+          >
+            <BarChart2 className="h-4 w-4" />
+            View Stats
+          </Link>
+          <button
+            onClick={() => setEditOpen(true)}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all hover:brightness-110 active:scale-95"
+            style={{ backgroundColor: c.bgSubtle, color: c.textMuted, border: `1px solid ${c.border}` }}
+          >
+            <Edit className="h-4 w-4" />
+            Edit
+          </button>
+          <button
+            onClick={() => onDelete(habit.id)}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all hover:brightness-110 active:scale-95"
+            style={{ backgroundColor: "hsl(0 72% 51% / 0.1)", color: "hsl(0 72% 60%)", border: "1px solid hsl(0 72% 51% / 0.2)" }}
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete
+          </button>
         </div>
       </div>
 
